@@ -69,11 +69,11 @@ async def main(img_path: str, user_prompt: str):
                 ]
                 logger.info(f"利用可能なBlenderツール数: {len(tools_schema)}")
 
-                # 3. Claudeへ初回リクエスト（画像＋プロンプト）
+                # 3. Claudeへ初回リクエスト（画像＋プロンプト＋画像パス明示）
                 logger.info("Claude APIに接続中...")
-                client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
-                img_b64 = await load_image_base64(img_path)
-                logger.info("画像の読み込みが完了しました")
+                async with anthropic.AsyncAnthropic(api_key=ANTHROPIC_API_KEY) as client:
+                    img_b64 = await load_image_base64(img_path)
+                    logger.info("画像の読み込みが完了しました")
 
                 # 画像のbase64エンコーディングを確認
                 logger.info(f"画像のbase64長さ: {len(img_b64)}")
@@ -85,7 +85,7 @@ async def main(img_path: str, user_prompt: str):
 
                 async def create_message():
                     logger.info("Claudeにメッセージを送信中...")
-                    return client.messages.create(
+                    return await client.messages.create(
                         model=MODEL,
                         max_tokens=1024,
                         tools=tools_schema,
@@ -102,7 +102,8 @@ async def main(img_path: str, user_prompt: str):
                                 },
                                 {   # テキストブロック
                                     "type": "text",
-                                    "text": user_prompt
+                                    "text": f"{user_prompt}。\n"
+                                            f"元画像はローカルで `{img_path}` に保存されています。"
                                 }
                             ]
                         }]
@@ -172,12 +173,16 @@ async def main(img_path: str, user_prompt: str):
 
                                     # Claudeへ実行結果を返却
                                     logger.info("Claudeに実行結果を送信中...")
-                                    msg = client.messages.create(
-                                        model=MODEL,
-                                        max_tokens=1024,
-                                        tools=tools_schema,
-                                        messages=messages
-                                    )
+
+                                    async def _send_tool_results_to_claude():
+                                        return await client.messages.create(
+                                            model=MODEL,
+                                            max_tokens=1024,
+                                            tools=tools_schema,
+                                            messages=messages
+                                        )
+                                    msg = await retry_on_overload(_send_tool_results_to_claude)
+                                    
                                     logger.info("Claudeからの応答を受信しました")
                                 except Exception as e:
                                     logger.error(f"ツール実行中にエラーが発生しました: {str(e)}")
@@ -205,17 +210,9 @@ async def main(img_path: str, user_prompt: str):
         logger.error(f"処理中にエラーが発生しました: {str(e)}")
         raise
     finally:
-        # 明示的にパイプをクローズ
-        if r is not None and hasattr(r, "close") and callable(r.close):
-            try:
-                await r.close()
-            except Exception as e:
-                logger.error(f"r パイプのクローズ中にエラーが発生しました: {str(e)}")
-        if w is not None and hasattr(w, "close") and callable(w.close):
-            try:
-                await w.close()
-            except Exception as e:
-                logger.error(f"w パイプのクローズ中にエラーが発生しました: {str(e)}")
+        # finallyブロックは維持しますが、パイプの明示的なクローズ処理は削除します。
+        # stdio_client のコンテキストマネージャがクローズを処理します。
+        pass
 
 if __name__ == "__main__":
     try:

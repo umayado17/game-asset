@@ -118,6 +118,10 @@ class PromptBuilder:
     """プロンプト生成"""
     
     def __init__(self):
+        # プロンプトテンプレート
+        # ゲームの世界観の特徴を記述します。
+        # このテンプレートは、世界観に応じたプロンプトを生成するためのものです。
+
         self.templates = {
             "fantasy": {
                 "art_style": "medieval fantasy",
@@ -138,17 +142,38 @@ class PromptBuilder:
     
     def build_prompt(self, world_setting: WorldSetting, asset_spec: AssetSpec) -> str:
         """テンプレートベースでプロンプトを生成"""
+        # この関数は、世界観とアセットの仕様に応じてプロンプトを生成します。
+        # プロンプトテンプレートを使用して、世界観に応じたプロンプトを生成します。
+        
         template = self.templates[world_setting.genre]
         
+        # 基本プロンプトの構築
         prompt = f"{template['art_style']} style {asset_spec.name} for a {world_setting.genre} game, "
         prompt += f"{template['color_palette']} color palette, {template['theme']} atmosphere, "
+        
+        # 世界観の説明を追加（空でない場合のみ）
+        if world_setting.description and world_setting.description != "説明なし":
+            prompt += f"in a world where {world_setting.description}, "
+        
+        # アセットの説明を追加
+        prompt += f"{asset_spec.description}, "
+        
+        # 共通の設定を追加
         prompt += "high quality, game asset, white background"
         
         return prompt
 
 class GeminiImageGenerator:
     """Geminiを使った画像生成"""
-    
+    # このクラスは、Gemini APIを使用して画像を生成するためのクラスです。
+    # 画像生成のためのプロンプトを生成し、Gemini APIを呼び出して画像を生成します。
+    # 生成された画像は、指定されたパスに保存されます。
+    # 新しい google.genai パッケージを使用しています。
+    # 古い google-generativeai パッケージは使用していません。
+    # AIによるコーディングはうまくいないことが多いです。
+    # 半分くらい手書きでコーディングしました。
+    # 参考サイト: https://qiita.com/Tadataka_Takahashi/items/67828d557090cc681d23
+
     def __init__(self, api_key: str):
         if not api_key or api_key == "your-gemini-api-key":
             raise APIKeyError("APIキーが設定されていません")
@@ -170,7 +195,6 @@ class GeminiImageGenerator:
             )
             
             # 生成された画像を保存
-            # if response.image:
             try:
                 for part in response.candidates[0].content.parts:
                     if part.text is not None:
@@ -211,6 +235,8 @@ class AssetPipeline:
     
     def get_asset_specs(self, world_setting: WorldSetting) -> List[AssetSpec]:
         """世界観に基づいてアセット仕様を取得"""
+        # 世界観に応じたアセット仕様を記述します。
+        
         specs = {
             "fantasy": [
                 AssetSpec("主人公キャラクター", "character", "プレイヤーが操作するメインキャラクター", ["hero", "protagonist"]),
