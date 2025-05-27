@@ -154,6 +154,7 @@ class GeminiImageGenerator:
         if not api_key or api_key == "your-gemini-api-key":
             raise APIKeyError("APIキーが設定されていません")
         try:
+            import google.generativeai as genai
             genai.configure(api_key=api_key)
             self.model = genai.GenerativeModel('gemini-2.0-flash-preview-image-generation')
         except Exception as e:
@@ -197,6 +198,15 @@ class AssetPipeline:
             self.file_manager = FileManager()
             self.prompt_builder = PromptBuilder()
             self.image_generator = GeminiImageGenerator(api_key)
+            # デフォルトの世界観設定を初期化
+            self.world_setting = WorldSetting(
+                name="テスト世界",
+                genre="fantasy",
+                art_style="cartoon",
+                color_palette="bright",
+                theme="adventure",
+                description="テスト用の世界観設定"
+            )
         except Exception as e:
             raise ConfigurationError(f"パイプラインの初期化に失敗: {e}")
     
@@ -301,8 +311,10 @@ def main():
                           help="出力ディレクトリ")
         args = parser.parse_args()
         
-        # API key設定（実際の使用時は環境変数から取得）
-        API_KEY = os.getenv("GEMINI_API_KEY", "your-gemini-api-key")
+        # API key設定（環境変数から取得）
+        API_KEY = os.getenv("GEMINI_API_KEY_SUBSC") or os.getenv("GEMINI_API_KEY")
+        if not API_KEY:
+            raise APIKeyError("環境変数 'GEMINI_API_KEY_SUBSC' または 'GEMINI_API_KEY' が設定されていません")
         
         # パイプライン初期化
         pipeline = AssetPipeline(API_KEY)
