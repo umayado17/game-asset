@@ -1,0 +1,72 @@
+[
+  {
+    "asset_name": "主人公キャラクター",
+    "prompt": "medieval fantasy style 主人公キャラクター for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, プレイヤーが操作するメインキャラクター, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\主人公キャラクター.png",
+    "generated_at": "2025-05-28T07:41:12.065340"
+  },
+  {
+    "asset_name": "剣",
+    "prompt": "medieval fantasy style 剣 for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, 主人公の武器, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\剣.png",
+    "generated_at": "2025-05-28T07:41:15.711702"
+  },
+  {
+    "asset_name": "城",
+    "prompt": "medieval fantasy style 城 for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, メインの拠点, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\城.png",
+    "generated_at": "2025-05-28T07:41:20.403486"
+  },
+  {
+    "asset_name": "森",
+    "prompt": "medieval fantasy style 森 for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, 冒険の舞台, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\森.png",
+    "generated_at": "2025-05-28T07:41:23.699914"
+  },
+  {
+    "asset_name": "宝箱",
+    "prompt": "medieval fantasy style 宝箱 for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, アイテムを収納, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\宝箱.png",
+    "generated_at": "2025-05-28T07:41:29.033527"
+  },
+  {
+    "asset_name": "魔法の杖",
+    "prompt": "medieval fantasy style 魔法の杖 for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, 魔法使いの武器, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\魔法の杖.png",
+    "generated_at": "2025-05-28T07:41:33.136145"
+  },
+  {
+    "asset_name": "ドラゴン",
+    "prompt": "medieval fantasy style ドラゴン for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, 伝説の生物, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\ドラゴン.png",
+    "generated_at": "2025-05-28T07:41:36.943260"
+  },
+  {
+    "asset_name": "魔法の薬",
+    "prompt": "medieval fantasy style 魔法の薬 for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, 回復アイテム, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\魔法の薬.png",
+    "generated_at": "2025-05-28T07:41:41.416658"
+  },
+  {
+    "asset_name": "洞窟",
+    "prompt": "medieval fantasy style 洞窟 for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, 隠し場所, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\洞窟.png",
+    "generated_at": "2025-05-28T07:41:46.228463"
+  },
+  {
+    "asset_name": "魔法の本",
+    "prompt": "medieval fantasy style 魔法の本 for a fantasy game, bright and magical color palette, enchanted atmosphere, in a world where 『進撃の巨人』の世界観は、圧倒的な絶望と希望が交錯するダークファンタジーの舞台です。人類は巨大な壁に囲まれた都市の中で生活し、外には恐ろしい巨人たちが徘徊しています。巨人は人間を捕食する謎の存在であり、壁の外に出ることは死を意味するほど危険なものとなっています。, 知識の源, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\進撃の巨人_20250528_074106\\assets\\魔法の本.png",
+    "generated_at": "2025-05-28T07:41:51.156205"
+  }
+]

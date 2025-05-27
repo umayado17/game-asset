@@ -1,0 +1,37 @@
+[
+  {
+    "asset_name": "宇宙船",
+    "prompt": "futuristic style 宇宙船 for a sci-fi game, cool and high-tech color palette, sci-fi atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\スターウォーズ_20250527_194817\\assets\\宇宙船.png",
+    "generated_at": "2025-05-27T19:48:21.875763"
+  },
+  {
+    "asset_name": "レーザー銃",
+    "prompt": "futuristic style レーザー銃 for a sci-fi game, cool and high-tech color palette, sci-fi atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\スターウォーズ_20250527_194817\\assets\\レーザー銃.png",
+    "generated_at": "2025-05-27T19:48:26.446966"
+  },
+  {
+    "asset_name": "宇宙ステーション",
+    "prompt": "futuristic style 宇宙ステーション for a sci-fi game, cool and high-tech color palette, sci-fi atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\スターウォーズ_20250527_194817\\assets\\宇宙ステーション.png",
+    "generated_at": "2025-05-27T19:48:29.933008"
+  },
+  {
+    "asset_name": "惑星",
+    "prompt": "futuristic style 惑星 for a sci-fi game, cool and high-tech color palette, sci-fi atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\スターウォーズ_20250527_194817\\assets\\惑星.png",
+    "generated_at": "2025-05-27T19:48:34.299453"
+  },
+  {
+    "asset_name": "ロボット",
+    "prompt": "futuristic style ロボット for a sci-fi game, cool and high-tech color palette, sci-fi atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\スターウォーズ_20250527_194817\\assets\\ロボット.png",
+    "generated_at": "2025-05-27T19:48:39.244040"
+  }
+]

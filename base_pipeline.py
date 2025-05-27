@@ -300,7 +300,7 @@ class AssetPipeline:
             
             for i, spec in enumerate(asset_specs, 1):
                 try:
-                    print(f"[{i}/5] {spec.name}生成中...")
+                    print(f"[{i}/{len(asset_specs)}] {spec.name}生成中...")
                     
                     # プロンプト生成
                     prompt = self.prompt_builder.build_prompt(world_setting, spec)

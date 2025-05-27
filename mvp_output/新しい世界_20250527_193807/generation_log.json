@@ -1,0 +1,37 @@
+[
+  {
+    "asset_name": "主人公キャラクター",
+    "prompt": "medieval fantasy style 主人公キャラクター for a fantasy game, bright and magical color palette, enchanted atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\新しい世界_20250527_193807\\assets\\主人公キャラクター.png",
+    "generated_at": "2025-05-27T19:38:12.349326"
+  },
+  {
+    "asset_name": "剣",
+    "prompt": "medieval fantasy style 剣 for a fantasy game, bright and magical color palette, enchanted atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\新しい世界_20250527_193807\\assets\\剣.png",
+    "generated_at": "2025-05-27T19:38:15.937136"
+  },
+  {
+    "asset_name": "城",
+    "prompt": "medieval fantasy style 城 for a fantasy game, bright and magical color palette, enchanted atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\新しい世界_20250527_193807\\assets\\城.png",
+    "generated_at": "2025-05-27T19:38:20.929355"
+  },
+  {
+    "asset_name": "森",
+    "prompt": "medieval fantasy style 森 for a fantasy game, bright and magical color palette, enchanted atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\新しい世界_20250527_193807\\assets\\森.png",
+    "generated_at": "2025-05-27T19:38:25.903647"
+  },
+  {
+    "asset_name": "宝箱",
+    "prompt": "medieval fantasy style 宝箱 for a fantasy game, bright and magical color palette, enchanted atmosphere, high quality, game asset, white background",
+    "status": "generated",
+    "file_path": "mvp_output\\新しい世界_20250527_193807\\assets\\宝箱.png",
+    "generated_at": "2025-05-27T19:38:30.528558"
+  }
+]

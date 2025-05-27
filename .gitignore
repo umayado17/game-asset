@@ -37,7 +37,6 @@ venv.bak/
 .DS_Store
 
 # プロジェクト固有
-mvp_output/
 *.log
 config.json
 .env
