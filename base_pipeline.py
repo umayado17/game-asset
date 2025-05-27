@@ -14,7 +14,6 @@ from google import genai
 from google.genai import types
 from PIL import Image
 from io import BytesIO
-import base64
 
 class GAAAGSError(Exception):
     """GAAAGSの基本例外クラス"""
@@ -154,9 +153,7 @@ class GeminiImageGenerator:
         if not api_key or api_key == "your-gemini-api-key":
             raise APIKeyError("APIキーが設定されていません")
         try:
-            import google.generativeai as genai
-            genai.configure(api_key=api_key)
-            self.model = genai.GenerativeModel('gemini-2.0-flash-preview-image-generation')
+            self.client = genai.Client(api_key=api_key)
         except Exception as e:
             raise ConfigurationError(f"Gemini APIの初期化に失敗: {e}")
     
@@ -164,24 +161,26 @@ class GeminiImageGenerator:
         """画像を生成して保存"""
         try:
             # 画像生成リクエスト
-            response = self.model.generate_content(
+            response = self.client.models.generate_content(
+                model = 'gemini-2.0-flash-preview-image-generation',
                 contents=prompt,
-                generation_config={
-                    "temperature": 0.7,
-                    "top_p": 0.8,
-                    "top_k": 40,
-                    "max_output_tokens": 2048,
-                }
+                config=types.GenerateContentConfig(
+                    response_modalities=['TEXT','IMAGE']
+                )
             )
             
             # 生成された画像を保存
-            if response.image:
-                try:
-                    with open(output_path, 'wb') as f:
-                        f.write(response.image)
-                    return True
-                except Exception as e:
-                    raise FileOperationError(f"画像の保存に失敗: {e}")
+            # if response.image:
+            try:
+                for part in response.candidates[0].content.parts:
+                    if part.text is not None:
+                        print(f"説明: {part.text}")
+                    elif part.inline_data is not None:
+                        image = Image.open(BytesIO(part.inline_data.data))
+                        image.save(output_path)
+                        return True
+            except Exception as e:
+                raise FileOperationError(f"画像の保存に失敗: {e}")
             else:
                 raise ImageGenerationError(f"画像生成に失敗: {response.text}")
             
@@ -297,16 +296,81 @@ class AssetPipeline:
         except Exception as e:
             raise GAAAGSError(f"世界観処理中にエラーが発生: {e}")
 
+class InteractiveConfig:
+    """対話式設定"""
+    
+    def __init__(self):
+        self.world_presets = {
+            "1": ("fantasy", "ファンタジー"),
+            "2": ("sci-fi", "SF"),
+            "3": ("modern", "現代")
+        }
+    
+    def get_project_name(self) -> str:
+        """プロジェクト名を取得"""
+        while True:
+            name = input("プロジェクト名を入力してください: ").strip()
+            if name:
+                return name
+            print("プロジェクト名は必須です。")
+    
+    def get_world_preset(self) -> str:
+        """世界観プリセットを取得"""
+        print("\n世界観を選択してください:")
+        for key, (_, name) in self.world_presets.items():
+            print(f"{key}) {name}")
+        
+        while True:
+            choice = input("選択 (1-3): ").strip()
+            if choice in self.world_presets:
+                return self.world_presets[choice][0]
+            print("1から3の数字を入力してください。")
+    
+    def get_world_description(self) -> str:
+        """世界観の説明を取得"""
+        description = input("\n世界観の説明（任意）: ").strip()
+        return description if description else "説明なし"
+    
+    def configure(self) -> WorldSetting:
+        """対話式で設定を取得"""
+        print("\n=== GAAAGS MVP ===")
+        
+        name = self.get_project_name()
+        genre = self.get_world_preset()
+        description = self.get_world_description()
+        
+        # 世界観に応じたデフォルト設定
+        if genre == "fantasy":
+            art_style = "cartoon"
+            color_palette = "bright"
+            theme = "adventure"
+        elif genre == "sci-fi":
+            art_style = "realistic"
+            color_palette = "cool"
+            theme = "sci-fi"
+        else:  # modern
+            art_style = "realistic"
+            color_palette = "natural"
+            theme = "contemporary"
+        
+        return WorldSetting(
+            name=name,
+            genre=genre,
+            art_style=art_style,
+            color_palette=color_palette,
+            theme=theme,
+            description=description
+        )
+
 def main():
     """メイン実行"""
     try:
         import argparse
         
         parser = argparse.ArgumentParser(description="GAAAGS MVP版")
-        parser.add_argument("--world", choices=["fantasy", "sci-fi", "modern"], default="fantasy",
+        parser.add_argument("--world", choices=["fantasy", "sci-fi", "modern"],
                           help="世界観プリセット")
-        parser.add_argument("--name", default="新しい世界",
-                          help="プロジェクト名")
+        parser.add_argument("--name", help="プロジェクト名")
         parser.add_argument("--output", default="mvp_output",
                           help="出力ディレクトリ")
         args = parser.parse_args()
@@ -320,16 +384,23 @@ def main():
         pipeline = AssetPipeline(API_KEY)
         
         # 世界観設定
-        world_setting = WorldSetting(
-            name=args.name,
-            genre=args.world,
-            art_style="cartoon" if args.world == "fantasy" else "realistic",
-            color_palette="bright" if args.world == "fantasy" else "cool",
-            theme="adventure" if args.world == "fantasy" else "sci-fi",
-            description=f"{args.world}の世界観で{args.name}を表現"
-        )
+        if args.world and args.name:
+            # コマンドライン引数から設定
+            world_setting = WorldSetting(
+                name=args.name,
+                genre=args.world,
+                art_style="cartoon" if args.world == "fantasy" else "realistic",
+                color_palette="bright" if args.world == "fantasy" else "cool",
+                theme="adventure" if args.world == "fantasy" else "sci-fi",
+                description=f"{args.world}の世界観で{args.name}を表現"
+            )
+        else:
+            # 対話式設定
+            config = InteractiveConfig()
+            world_setting = config.configure()
         
         # アセット生成実行
+        print("\n生成開始...")
         assets = pipeline.process_world(world_setting)
         
         # 結果表示
