@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 from typing import Dict, Optional
 from dataclasses import dataclass
+import time
+from datetime import datetime
 
 @dataclass
 class ConversionSettings:
@@ -13,6 +15,39 @@ class ConversionSettings:
     texture_size: int = 1024
     generate_lod: bool = True
     export_format: str = "fbx"  # fbx, obj, gltf
+    
+    @property
+    def displacement_strength(self) -> float:
+        """品質に応じたディスプレースメント強度を返す"""
+        return {
+            "low": 0.05,
+            "medium": 0.1,
+            "high": 0.2
+        }.get(self.quality, 0.1)
+    
+    @property
+    def poly_limit(self) -> int:
+        """品質に応じたポリゴン数制限を返す"""
+        return {
+            "low": 1000,
+            "medium": 5000,
+            "high": 10000
+        }.get(self.quality, 5000)
+
+@dataclass
+class ConversionMetadata:
+    """変換メタデータ"""
+    model_info: Dict
+    conversion_info: Dict
+    
+    def save(self, output_path: str):
+        """メタデータをJSONファイルとして保存"""
+        metadata_path = Path(output_path).parent / "metadata.json"
+        with open(metadata_path, 'w', encoding='utf-8') as f:
+            json.dump({
+                "model_info": self.model_info,
+                "conversion_info": self.conversion_info
+            }, f, indent=2, ensure_ascii=False)
 
 class BlenderMCPConverter:
     """Blender-MCPを使った3D変換"""
@@ -21,11 +56,13 @@ class BlenderMCPConverter:
         self.blender_path = blender_path or self.find_blender()
         self.mcp_script_path = Path("blender_mcp_script.py")
         self.setup_mcp_script()
+        self.max_retries = 3
+        self.error_log = []
     
     def find_blender(self) -> str:
         """Blenderの実行ファイルを探す"""
         common_paths = [
-            r"C:\Program Files\Blender Foundation\Blender 4.0\blender.exe",
+            r"C:\Program Files\Blender Foundation\Blender 4.4\blender.exe",
             r"C:\Program Files\Blender Foundation\Blender 3.6\blender.exe",
             "blender"  # PATH通っている場合
         ]
@@ -86,8 +123,14 @@ def create_plane_with_image(image_path, settings):
     principled = nodes.new('ShaderNodeBsdfPrincipled')
     
     # 画像テクスチャノード
+    image = bpy.data.images.load(image_path)
+    
+    # テクスチャサイズの調整
+    if image.size[0] > settings.get('texture_size', 1024) or image.size[1] > settings.get('texture_size', 1024):
+        image.scale(settings.get('texture_size', 1024), settings.get('texture_size', 1024))
+    
     image_node = nodes.new('ShaderNodeTexImage')
-    image_node.image = bpy.data.images.load(image_path)
+    image_node.image = image
     
     # 出力ノード
     output = nodes.new('ShaderNodeOutputMaterial')
@@ -97,6 +140,29 @@ def create_plane_with_image(image_path, settings):
     links.new(principled.outputs['BSDF'], output.inputs['Surface'])
     
     return plane
+
+def generate_lod(obj, quality_levels):
+    """LODを生成"""
+    lods = []
+    original_poly_count = len(obj.data.polygons)
+    
+    for level, ratio in quality_levels.items():
+        if level == "high":
+            lods.append(obj)
+            continue
+            
+        # デシメート修飾子でポリゴン数削減
+        decimate = obj.modifiers.new(name=f"Decimate_{level}", type='DECIMATE')
+        decimate.type = 'RATIO'
+        decimate.ratio = ratio
+        
+        # 修飾子適用
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.modifier_apply(modifier=decimate.name)
+        
+        lods.append(obj)
+    
+    return lods
 
 def apply_displacement_from_image(obj, image_path, strength=0.1):
     """画像の明度に基づいてディスプレースメントを適用"""
@@ -132,32 +198,70 @@ def optimize_mesh(obj, poly_limit):
     bpy.context.view_layer.objects.active = obj
     bpy.ops.object.modifier_apply(modifier=decimate.name)
 
-def export_model(obj, output_path, format_type):
+def export_model(obj, output_path, format_type, generate_lod=False):
     """モデルをエクスポート"""
     
-    # オブジェクト選択
-    bpy.ops.object.select_all(action='DESELECT')
-    obj.select_set(True)
-    bpy.context.view_layer.objects.active = obj
-    
-    # フォーマットに応じてエクスポート
-    if format_type.lower() == 'fbx':
-        bpy.ops.export_scene.fbx(
-            filepath=output_path,
-            use_selection=True,
-            embed_textures=True
-        )
-    elif format_type.lower() == 'obj':
-        bpy.ops.export_scene.obj(
-            filepath=output_path,
-            use_selection=True
-        )
-    elif format_type.lower() == 'gltf':
-        bpy.ops.export_scene.gltf(
-            filepath=output_path,
-            use_selection=True,
-            export_format='GLB'
-        )
+    if generate_lod:
+        # LOD生成
+        quality_levels = {
+            "high": 1.0,
+            "medium": 0.5,
+            "low": 0.25
+        }
+        lods = generate_lod(obj, quality_levels)
+        
+        # 各LODをエクスポート
+        for level, lod_obj in zip(quality_levels.keys(), lods):
+            output_dir = os.path.dirname(output_path)
+            lod_path = os.path.join(output_dir, level, os.path.basename(output_path))
+            os.makedirs(os.path.dirname(lod_path), exist_ok=True)
+            
+            # オブジェクト選択
+            bpy.ops.object.select_all(action='DESELECT')
+            lod_obj.select_set(True)
+            bpy.context.view_layer.objects.active = lod_obj
+            
+            # フォーマットに応じてエクスポート
+            if format_type.lower() == 'fbx':
+                bpy.ops.export_scene.fbx(
+                    filepath=lod_path,
+                    use_selection=True,
+                    embed_textures=True
+                )
+            elif format_type.lower() == 'obj':
+                bpy.ops.export_scene.obj(
+                    filepath=lod_path,
+                    use_selection=True
+                )
+            elif format_type.lower() == 'gltf':
+                bpy.ops.export_scene.gltf(
+                    filepath=lod_path,
+                    use_selection=True,
+                    export_format='GLB'
+                )
+    else:
+        # 通常のエクスポート
+        bpy.ops.object.select_all(action='DESELECT')
+        obj.select_set(True)
+        bpy.context.view_layer.objects.active = obj
+        
+        if format_type.lower() == 'fbx':
+            bpy.ops.export_scene.fbx(
+                filepath=output_path,
+                use_selection=True,
+                embed_textures=True
+            )
+        elif format_type.lower() == 'obj':
+            bpy.ops.export_scene.obj(
+                filepath=output_path,
+                use_selection=True
+            )
+        elif format_type.lower() == 'gltf':
+            bpy.ops.export_scene.gltf(
+                filepath=output_path,
+                use_selection=True,
+                export_format='GLB'
+            )
 
 def main():
     """メイン処理"""
@@ -199,13 +303,14 @@ def main():
     if settings.get('quality') in ['medium', 'high']:
         # ディスプレースメント適用
         apply_displacement_from_image(obj, image_path, 
-                                    strength=0.2 if settings.get('quality') == 'high' else 0.1)
+                                    strength=settings.get('displacement_strength', 0.1))
     
     # メッシュ最適化
     optimize_mesh(obj, settings.get('poly_count_limit', 5000))
     
     # エクスポート
-    export_model(obj, output_path, settings.get('export_format', 'fbx'))
+    export_model(obj, output_path, settings.get('export_format', 'fbx'),
+                generate_lod=settings.get('generate_lod', False))
     
     print(f"Conversion completed: {output_path}")
 
@@ -216,6 +321,65 @@ if __name__ == "__main__":
         with open(self.mcp_script_path, 'w', encoding='utf-8') as f:
             f.write(script_content)
     
+    def log_error(self, error_type: str, message: str, details: Dict = None):
+        """エラーをログに記録"""
+        self.error_log.append({
+            "timestamp": datetime.now().isoformat(),
+            "type": error_type,
+            "message": message,
+            "details": details or {}
+        })
+    
+    def batch_convert(self, image_paths: list, output_dir: str, 
+                     settings: ConversionSettings = None) -> Dict[str, str]:
+        """複数の画像をバッチ処理で変換"""
+        if len(image_paths) > 10:
+            raise ValueError("最大10ファイルまで同時処理可能です")
+        
+        results = {}
+        output_dir = Path(output_dir)
+        output_dir.mkdir(parents=True, exist_ok=True)
+        
+        # 品質別の出力ディレクトリを作成
+        quality_dirs = {
+            "low": output_dir / "low",
+            "medium": output_dir / "medium",
+            "high": output_dir / "high"
+        }
+        for dir_path in quality_dirs.values():
+            dir_path.mkdir(exist_ok=True)
+        
+        for image_path in image_paths:
+            image_path = Path(image_path)
+            quality = settings.quality if settings else "medium"
+            output_path = quality_dirs[quality] / f"{image_path.stem}.{settings.export_format}"
+            
+            # 最大3回までリトライ
+            for attempt in range(self.max_retries):
+                try:
+                    result = self.convert_to_3d(str(image_path), str(output_path), settings)
+                    if result:
+                        results[str(image_path)] = result
+                        break
+                    else:
+                        self.log_error("conversion_failed", 
+                                     f"変換失敗 (試行 {attempt + 1}/{self.max_retries})",
+                                     {"image_path": str(image_path)})
+                except Exception as e:
+                    self.log_error("conversion_error",
+                                 str(e),
+                                 {"image_path": str(image_path), "attempt": attempt + 1})
+                    if attempt == self.max_retries - 1:
+                        results[str(image_path)] = None
+        
+        # エラーログを保存
+        if self.error_log:
+            log_path = output_dir / "error_log.json"
+            with open(log_path, 'w', encoding='utf-8') as f:
+                json.dump(self.error_log, f, indent=2, ensure_ascii=False)
+        
+        return results
+    
     def convert_to_3d(self, image_path: str, output_path: str, 
                      settings: ConversionSettings = None) -> Optional[str]:
         """2D画像を3Dモデルに変換"""
@@ -223,10 +387,12 @@ if __name__ == "__main__":
         if settings is None:
             settings = ConversionSettings()
         
+        start_time = time.time()
+        
         # 設定をJSONで渡す
         settings_json = json.dumps({
             'quality': settings.quality,
-            'poly_count_limit': settings.poly_count_limit,
+            'poly_count_limit': settings.poly_limit,
             'texture_size': settings.texture_size,
             'generate_lod': settings.generate_lod,
             'export_format': settings.export_format
@@ -245,9 +411,57 @@ if __name__ == "__main__":
         
         try:
             print(f"Starting 3D conversion: {image_path}")
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+            # エンコーディングを明示的に指定
+            result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                encoding='utf-8',
+                errors='replace',  # エンコーディングエラーを置換文字で処理
+                timeout=300
+            )
+            
+            # 出力を表示（デバッグ用）
+            print("Blender stdout:", result.stdout)
+            if result.stderr:
+                print("Blender stderr:", result.stderr)
             
             if result.returncode == 0:
+                # 出力ファイルの検証
+                if not os.path.exists(output_path):
+                    print(f"✗ 出力ファイルが生成されていません: {output_path}")
+                    return None
+                
+                file_size = os.path.getsize(output_path)
+                if file_size == 0:
+                    print(f"✗ 出力ファイルサイズが0バイトです: {output_path}")
+                    return None
+                
+                # メタデータ生成
+                metadata = ConversionMetadata(
+                    model_info={
+                        "name": Path(output_path).stem,
+                        "polygon_count": settings.poly_limit,
+                        "texture_size": settings.texture_size,
+                        "quality_level": settings.quality,
+                        "export_format": settings.export_format
+                    },
+                    conversion_info={
+                        "conversion_time": datetime.now().isoformat(),
+                        "original_image": image_path,
+                        "settings_used": {
+                            "quality": settings.quality,
+                            "poly_count_limit": settings.poly_limit,
+                            "texture_size": settings.texture_size,
+                            "generate_lod": settings.generate_lod,
+                            "export_format": settings.export_format
+                        }
+                    }
+                )
+                
+                # メタデータ保存
+                metadata.save(output_path)
+                
                 print(f"✓ 3D conversion successful: {output_path}")
                 return output_path
             else:
@@ -294,20 +508,31 @@ class ConversionTester:
             
             if result:
                 file_size = os.path.getsize(result) if os.path.exists(result) else 0
-                results.append({
-                    'name': test_name,
-                    'success': True,
-                    'file_size': file_size,
-                    'settings': settings
-                })
-                print(f"  ✓ 成功 (ファイルサイズ: {file_size} bytes)")
+                if file_size == 0:
+                    print(f"  ✗ 失敗: 出力ファイルサイズが0バイトです")
+                    results.append({
+                        'name': test_name,
+                        'success': False,
+                        'file_size': 0,
+                        'settings': settings,
+                        'error': '出力ファイルサイズが0バイト'
+                    })
+                else:
+                    results.append({
+                        'name': test_name,
+                        'success': True,
+                        'file_size': file_size,
+                        'settings': settings
+                    })
+                    print(f"  ✓ 成功 (ファイルサイズ: {file_size} bytes)")
             else:
                 results.append({
                     'name': test_name,
                     'success': False,
-                    'settings': settings
+                    'settings': settings,
+                    'error': '変換処理が失敗'
                 })
-                print(f"  ✗ 失敗")
+                print(f"  ✗ 失敗: 変換処理が失敗しました")
             
             print()
         

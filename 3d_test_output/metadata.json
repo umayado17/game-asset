@@ -1,0 +1,20 @@
+{
+  "model_info": {
+    "name": "test_high",
+    "polygon_count": 10000,
+    "texture_size": 1024,
+    "quality_level": "high",
+    "export_format": "fbx"
+  },
+  "conversion_info": {
+    "conversion_time": "2025-05-27T21:06:03.533999",
+    "original_image": "3d_test_output\\test_texture.png",
+    "settings_used": {
+      "quality": "high",
+      "poly_count_limit": 10000,
+      "texture_size": 1024,
+      "generate_lod": true,
+      "export_format": "fbx"
+    }
+  }
+}
