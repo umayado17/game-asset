@@ -217,21 +217,36 @@ class AssetPipeline:
                 AssetSpec("剣", "weapon", "主人公の武器", ["sword", "weapon"]),
                 AssetSpec("城", "building", "メインの拠点", ["castle", "building"]),
                 AssetSpec("森", "environment", "冒険の舞台", ["forest", "nature"]),
-                AssetSpec("宝箱", "item", "アイテムを収納", ["treasure", "chest"])
+                AssetSpec("宝箱", "item", "アイテムを収納", ["treasure", "chest"]),
+                AssetSpec("魔法の杖", "weapon", "魔法使いの武器", ["staff", "magic"]),
+                AssetSpec("ドラゴン", "character", "伝説の生物", ["dragon", "monster"]),
+                AssetSpec("魔法の薬", "item", "回復アイテム", ["potion", "healing"]),
+                AssetSpec("洞窟", "environment", "隠し場所", ["cave", "dungeon"]),
+                AssetSpec("魔法の本", "item", "知識の源", ["book", "magic"])
             ],
             "sci-fi": [
                 AssetSpec("宇宙船", "vehicle", "プレイヤーの乗り物", ["spaceship", "vehicle"]),
                 AssetSpec("レーザー銃", "weapon", "未来の武器", ["laser", "weapon"]),
                 AssetSpec("宇宙ステーション", "building", "メインの拠点", ["station", "building"]),
                 AssetSpec("惑星", "environment", "探索の舞台", ["planet", "space"]),
-                AssetSpec("ロボット", "character", "AI仲間", ["robot", "ai"])
+                AssetSpec("ロボット", "character", "AI仲間", ["robot", "ai"]),
+                AssetSpec("量子コンピュータ", "item", "高度な計算機", ["computer", "quantum"]),
+                AssetSpec("宇宙服", "item", "生命維持装置", ["suit", "protection"]),
+                AssetSpec("反物質エンジン", "item", "推進システム", ["engine", "power"]),
+                AssetSpec("人工衛星", "building", "監視システム", ["satellite", "monitoring"]),
+                AssetSpec("ホログラム", "item", "投影装置", ["hologram", "display"])
             ],
             "modern": [
                 AssetSpec("主人公キャラクター", "character", "プレイヤーが操作するメインキャラクター", ["hero", "protagonist"]),
                 AssetSpec("スマートフォン", "item", "現代の必須アイテム", ["phone", "device"]),
                 AssetSpec("オフィスビル", "building", "メインの拠点", ["office", "building"]),
                 AssetSpec("車", "vehicle", "移動手段", ["car", "vehicle"]),
-                AssetSpec("スマートウォッチ", "item", "装備品", ["watch", "device"])
+                AssetSpec("スマートウォッチ", "item", "装備品", ["watch", "device"]),
+                AssetSpec("ノートパソコン", "item", "作業用デバイス", ["laptop", "computer"]),
+                AssetSpec("カフェ", "building", "休憩場所", ["cafe", "rest"]),
+                AssetSpec("電車", "vehicle", "公共交通機関", ["train", "transport"]),
+                AssetSpec("公園", "environment", "憩いの場", ["park", "nature"]),
+                AssetSpec("ドローン", "vehicle", "空撮用機器", ["drone", "camera"])
             ]
         }
         
