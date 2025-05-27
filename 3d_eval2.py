@@ -15,7 +15,11 @@ async def main():
         async with ClientSession(read_stream, write_stream) as session:
             await session.initialize()          # 初期化ハンドシェイク
             tools = await session.list_tools()  # 使えるBlenderツール一覧
-            print([t.name for t in tools.tools])
+            for tool in tools.tools:
+                print(f"Tool name: {tool.name}")
+                print(f"Tool description: {tool.description}")
+                print(f"Tool attributes: {dir(tool)}")  # 利用可能な属性を表示
+                print("---")
 
             # 例：立方体を作る
             await session.call_tool("create_cube", {"size": 2})
