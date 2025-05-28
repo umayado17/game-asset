@@ -1,0 +1,93 @@
+# 3Dモデル生成の設定と手順
+# ファイル設定
+files:
+  item_list:
+    default_file: "items.yaml"  # デフォルトのアイテムリストファイル
+    allow_custom: true         # カスタムファイル名を許可
+    required: true            # アイテムリストは必須
+
+# 処理手順の定義
+steps:
+  - name: "ファイル確認"
+    type: "init"
+    action: "check_files"
+    description: "必要なファイルの存在確認"
+
+  - name: "初期化"
+    type: "init"
+    action: "check_blender_connection"
+    description: "Blenderとの通信確認"
+
+  - name: "シーン確認"
+    type: "check"
+    action: "get_scene_info"
+    description: "現在のシーン情報を取得"
+
+  - name: "Hyper3D確認"
+    type: "check"
+    action: "get_hyper3d_status"
+    description: "Hyper3D Rodinの状態確認"
+
+  - name: "アイテム生成ループ"
+    type: "loop"
+    action: "process_items"
+    description: "アイテムリストの処理"
+    loop_settings:
+      target: "items"  # itemsリストをループ
+      for_each:
+        # 各アイテムに対する処理
+        - step: "generate"
+          action: "generate_hyper3d_model"
+          params:
+            use_item_prompt: true  # アイテムのプロンプトを使用
+            wait_for_completion: true
+            timeout: 300  # 5分のタイムアウト
+
+        - step: "import"
+          action: "import_generated_asset"
+          params:
+            use_item_name: true    # アイテムの名前を使用
+            position:
+              type: "incremental"  # 増分位置指定
+              x_offset: "${placement.x_offset}"  # 設定値を参照
+              y: "${placement.initial_position.y}"
+              z: "${placement.initial_position.z}"
+
+# モデル生成設定
+generation:
+  error_handling:
+    continue_on_error: true  # エラー時も続行
+    log_errors: true         # エラーをログに記録
+    error_log_file: "generation_errors.log"
+
+# アイテムリストの設定
+items_config:
+  source: "embedded"  # "embedded" または "external"
+  external_file: "${files.item_list.default_file}"  # 外部ファイルを使用する場合
+
+# 生成するアイテムリスト（embedded の場合に使用）
+items:
+  - name: "WoodenTable"
+    prompt: "A wooden dining table with a smooth surface and four legs, made from rich brown oak wood"
+  - name: "ModernChair"
+    prompt: "A modern dining chair with a sleek design, made from dark wood and metal"
+  - name: "Bookshelf"
+    prompt: "A tall wooden bookshelf with five shelves, made from walnut wood"
+  - name: "DeskLamp"
+    prompt: "A modern desk lamp with adjustable arm, made from brushed metal"
+  - name: "CoffeeTable"
+    prompt: "A round coffee table with glass top and metal base"
+
+# モデル配置の設定
+placement:
+  x_offset: 5.0  # X軸方向のオフセット
+  initial_position:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+
+# 後処理
+post_processing:
+  save_scene: true
+  generate_report: true
+  report_file: "generation_report.json" 

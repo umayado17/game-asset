@@ -1,0 +1,110 @@
+# RPG用アイテムリスト
+items:
+  - name: "BattleAxe"
+    prompt: "A medieval battle axe with a curved steel blade and wooden handle, decorated with intricate Nordic patterns on the blade. The axe head should be weathered steel with a sharp edge, and the wooden handle should have leather wrappings for grip"
+    metadata:
+      type: "weapon"
+      category: "axe"
+      style: "medieval_nordic"
+      material:
+        head: "steel"
+        handle: "wood_and_leather"
+      size:
+        length: "medium"  # 適度な長さ
+        weight: "heavy"   # 重厚な見た目 
+
+  - name: "LongSword"
+    prompt: "A medieval knight's longsword with a double-edged straight blade, decorated with golden filigree on the crossguard. The blade should be polished steel with a sharp edge, the handle wrapped in high-quality brown leather, and the pommel featuring a small ruby gem"
+    metadata:
+      type: "weapon"
+      category: "sword"
+      style: "medieval_knight"
+      material:
+        blade: "polished_steel"
+        handle: "leather_and_gold"
+      size:
+        length: "long"
+        weight: "medium"
+
+  - name: "KnightShield"
+    prompt: "A medieval kite shield with a steel frame and wooden core, decorated with a golden dragon emblem on a deep blue background. The shield should have battle-worn edges but maintained decorations, with steel reinforcements along the rim"
+    metadata:
+      type: "armor"
+      category: "shield"
+      style: "medieval_heraldic"
+      material:
+        frame: "steel"
+        core: "wood"
+        surface: "painted_metal"
+      size:
+        height: "large"
+        weight: "medium"
+
+  - name: "WarriorHelmet"
+    prompt: "A medieval knight's helmet with a hinged visor, decorated with elegant engravings and a red plume on top. The helmet should be made of polished steel with brass trim, featuring breathing holes in a decorative pattern"
+    metadata:
+      type: "armor"
+      category: "helmet"
+      style: "medieval_knight"
+      material:
+        main: "polished_steel"
+        trim: "brass"
+      size:
+        fit: "adjustable"
+        weight: "medium"
+
+  - name: "PlateArmor"
+    prompt: "A medieval knight's chest plate with matching pauldrons and backplate, decorated with intricate engravings and gold trim along the edges. The armor should be made of polished steel with a subtle blue tint, featuring leather straps and brass buckles for adjustment"
+    metadata:
+      type: "armor"
+      category: "chest"
+      style: "medieval_knight"
+      material:
+        main: "polished_steel"
+        trim: "gold"
+        fittings: "brass_and_leather"
+      size:
+        fit: "adjustable"
+        weight: "heavy"
+
+  - name: "LegArmor"
+    prompt: "Medieval knight's leg armor including greaves and sabatons, decorated with matching engravings to the chest plate. The armor should be made of polished steel with articulated joints for mobility, featuring leather straps for secure fitting"
+    metadata:
+      type: "armor"
+      category: "legs"
+      style: "medieval_knight"
+      material:
+        main: "polished_steel"
+        joints: "articulated_steel"
+        fittings: "leather"
+      size:
+        fit: "adjustable"
+        weight: "medium"
+
+  - name: "ElvenBow"
+    prompt: "An elegant elven longbow made of pale wood with silver inlays forming leaf patterns along its length. The bow should be naturally curved with decorative end tips, featuring a comfortable grip wrapped in white leather and a silver string"
+    metadata:
+      type: "weapon"
+      category: "bow"
+      style: "elven"
+      material:
+        body: "enchanted_wood"
+        decorations: "silver"
+        string: "silver_thread"
+      size:
+        length: "long"
+        weight: "light"
+
+  - name: "Arrows"
+    prompt: "A bundle of elegant elven arrows with silver arrowheads and white-feathered fletching. The arrows should have slender wooden shafts with delicate spiral engravings, matching the style of the elven bow"
+    metadata:
+      type: "weapon"
+      category: "ammunition"
+      style: "elven"
+      material:
+        head: "silver"
+        shaft: "light_wood"
+        fletching: "white_feathers"
+      size:
+        length: "medium"
+        weight: "very_light" 

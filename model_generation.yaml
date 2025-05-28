@@ -1,0 +1,114 @@
+# 3Dモデル生成の手順と設定
+
+# アイテムリストの設定
+items_config:
+  external_file: "items.yaml"  # アイテムリストの外部ファイル名
+
+# 処理手順の定義
+steps:
+  - name: "ファイル確認"
+    type: "init"
+    action: "check_files"
+    description: "必要なファイルの存在確認"
+
+  - name: "初期化"
+    type: "init"
+    action: "check_blender_connection"
+    description: "Blenderとの通信確認"
+
+  - name: "シーン確認"
+    type: "check"
+    action: "get_scene_info"
+    description: "現在のシーン情報を取得"
+
+  - name: "Hyper3D確認"
+    type: "check"
+    action: "get_hyper3d_status"
+    description: "Hyper3D Rodinの状態確認"
+
+  - name: "アイテム生成ループ"
+    type: "loop"
+    action: "process_items"
+    description: "アイテムリストの処理"
+    loop_settings:
+      target: "items"  # itemsリストをループ
+      for_each:
+        # 1. 生成（リモート）
+        - step: "generate"
+          action: "generate_hyper3d_model"
+          description: "Hyper3Dで3Dモデルを生成"
+          params:
+            use_item_prompt: true  # アイテムのプロンプトを使用
+            wait_for_completion: true
+            timeout: 300  # 5分のタイムアウト
+
+        # 2. インポート（Blenderシーンへ）
+        - step: "import"
+          action: "import_generated_asset"
+          description: "生成された3DモデルをBlenderシーンにインポート"
+          params:
+            use_item_name: true    # アイテムの名前を使用
+            position:
+              type: "incremental"  # 増分位置指定
+              x_offset: "${placement.x_offset}"  # 設定値を参照
+              y: "${placement.initial_position.y}"
+              z: "${placement.initial_position.z}"
+
+        # 3. 個別保存（新規追加）
+        - step: "export"
+          action: "export_individual_asset"
+          description: "生成された3Dモデルを個別に保存"
+          params:
+            target_object: "${current_item.name}"  # インポートされたオブジェクト名
+            export_format: "glb"  # または "obj", "fbx"
+            output_path: "${export_settings.output_directory}/${current_item.name}.glb"
+            include_materials: true
+            include_textures: true
+
+# エラーハンドリング
+generation:
+  error_handling:
+    continue_on_error: true  # エラー時も続行
+    log_errors: true        # エラーをログに記録
+    error_log_file: "generation_errors.log"
+    
+    # エクスポート固有のエラーハンドリング
+    export_errors:
+      skip_on_failure: true  # エクスポート失敗時はスキップして次へ
+      retry_count: 2  # 最大2回リトライ
+      fallback_format: "obj"  # GLBエクスポート失敗時のフォールバック
+
+# モデル配置の設定
+placement:
+  x_offset: 5.0  # X軸方向のオフセット
+  initial_position:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+
+# エクスポート設定
+export_settings:
+  output_directory: "~/Dropbox/研究開発/生成AI/ゲームアセット/assets/assets_${date}"
+  date_format: "YYYYMMDD-HHMM"  # 20250528-1805形式
+  create_directory: true  # ディレクトリが存在しない場合作成
+  file_format: "glb"  # デフォルトのファイル形式
+  overwrite_existing: true  # 既存ファイルの上書き許可
+  
+  # ファイル命名規則
+  naming_convention:
+    pattern: "${item_name}"  # シンプルにアイテム名のみ
+    include_timestamp: false  # タイムスタンプを含めない
+    
+  # エクスポートオプション
+  export_options:
+    include_materials: true
+    include_textures: true
+    include_animations: false
+    apply_modifiers: true
+    export_selected_only: true  # 選択されたオブジェクトのみ
+
+# 後処理
+post_processing:
+  save_scene: true
+  generate_report: true
+  report_file: "generation_report.json"
